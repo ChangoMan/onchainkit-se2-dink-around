@@ -2,7 +2,11 @@ import { useCallback, useState } from "react";
 import { getTokens } from "@coinbase/onchainkit/api";
 import { Token, TokenChip, TokenRow, TokenSearch } from "@coinbase/onchainkit/token";
 
-export const OnchainKitTokens = () => {
+interface OnchainKitTokensProps {
+  onTokenSelect: (token: Token) => void;
+}
+
+export const OnchainKitTokens = ({ onTokenSelect }: OnchainKitTokensProps) => {
   const [filteredTokens, setFilteredTokens] = useState<Token[]>([]);
 
   const handleChange = useCallback((value: string) => {
@@ -15,16 +19,13 @@ export const OnchainKitTokens = () => {
     getData(value);
   }, []);
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  const handleSelect = () => {};
-
   return (
     <div className="flex flex-col w-full max-w-[500px] gap-4 rounded-3xl p-4">
       <TokenSearch onChange={handleChange} delayMs={200} />
       {filteredTokens.length > 0 && (
         <div className="flex gap-2">
           {filteredTokens.map(token => (
-            <TokenChip key={token.address} token={token} onClick={handleSelect} />
+            <TokenChip key={token.address} token={token} onClick={onTokenSelect} />
           ))}
         </div>
       )}
@@ -33,12 +34,12 @@ export const OnchainKitTokens = () => {
           <div className="text-body text-black">Tokens</div>
           <div>
             {filteredTokens.map(token => (
-              <TokenRow key={token.address} token={token} onClick={handleSelect} />
+              <TokenRow key={token.address} token={token} onClick={onTokenSelect} />
             ))}
           </div>
         </div>
       ) : (
-        <div className="text-body text-black">No tokens found</div>
+        <div className="text-body text-black"></div>
       )}
     </div>
   );

@@ -1,67 +1,113 @@
 "use client";
 
-import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { OnchainKitTokens } from "./onchainkit-examples/_components/OnchainKitTokens";
+import { setOnchainKitConfig } from "@coinbase/onchainkit";
+import { getTokens } from "@coinbase/onchainkit/api";
+import { TokenRow } from "@coinbase/onchainkit/token";
+import type { Token } from "@coinbase/onchainkit/token";
 import type { NextPage } from "next";
-import { useAccount } from "wagmi";
-import { BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { Address } from "~~/components/scaffold-eth";
+
+interface TokenListProps {
+  tokens: Token[];
+  onTokenClick?: (token: Token) => void;
+}
+
+export function TokenList({ tokens, onTokenClick }: TokenListProps) {
+  return (
+    <div className="">
+      {tokens.map(token => (
+        <div key={`${token.chainId}-${token.address}`} className="">
+          <TokenRow token={token} onClick={onTokenClick} className="mb-2" />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 const Home: NextPage = () => {
-  const { address: connectedAddress } = useAccount();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [tokenKey, setTokenKey] = useState(0);
+  const [knownTokens, setKnownTokens] = useState<Token[]>([]);
+
+  // Initialize OnchainKit with API key from env
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY) {
+      setOnchainKitConfig({ apiKey: process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY });
+    }
+  }, []);
+
+  // Initialize knownTokens from URL params
+  useEffect(() => {
+    const fetchTokenDetails = async (addresses: string[]) => {
+      const tokenPromises = addresses.map(address => {
+        // Convert zero address back to empty string when fetching
+        const searchAddress = address === "0x0000000000000000000000000000000000000000" ? "" : address;
+        return getTokens({ limit: "1", search: searchAddress })
+          .then(response => {
+            console.log("response", response);
+            return response[0];
+          })
+          .catch(error => {
+            console.error(`Error fetching token ${address}:`, error);
+            return null;
+          });
+      });
+
+      const tokens = await Promise.all(tokenPromises);
+      setKnownTokens(tokens.filter(token => token !== null));
+    };
+
+    const tokensParam = searchParams.get("tokens");
+    if (tokensParam) {
+      const tokenAddresses = tokensParam.split(",");
+      fetchTokenDetails(tokenAddresses);
+    } else {
+      setKnownTokens([]);
+    }
+  }, [searchParams]);
+
+  // Update URL when knownTokens changes
+  useEffect(() => {
+    if (knownTokens.length > 0) {
+      const newTokensParam = knownTokens
+        .map(
+          t =>
+            // Use zero address in URL if contract address is empty
+            t.address || "0x0000000000000000000000000000000000000000",
+        )
+        .join(",");
+      router.push(`?tokens=${newTokensParam}`);
+    }
+  }, [knownTokens, router]);
+
+  const handleTokenSelect = (token: Token) => {
+    console.log("SELECTED", token);
+    setTokenKey(prev => prev + 1);
+
+    // Add token to knownTokens if it doesn't exist already
+    setKnownTokens(prev => {
+      const tokenExists = prev.some(t => t.address === token.address);
+      if (!tokenExists) {
+        return [...prev, token];
+      }
+      return prev;
+    });
+  };
 
   return (
     <>
       <div className="flex items-center flex-col flex-grow pt-10">
-        <div className="px-5">
-          <h1 className="text-center">
-            <span className="block text-2xl mb-2">Welcome to</span>
-            <span className="block text-4xl font-bold">Scaffold-ETH 2</span>
-          </h1>
-          <div className="flex justify-center items-center space-x-2 flex-col sm:flex-row">
-            <p className="my-2 font-medium">Connected Address:</p>
-            <Address address={connectedAddress} />
-          </div>
-
-          <p className="text-center text-lg">
-            Get started by editing{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              packages/nextjs/app/page.tsx
-            </code>
-          </p>
-          <p className="text-center text-lg">
-            Edit your smart contract{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              YourContract.sol
-            </code>{" "}
-            in{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              packages/hardhat/contracts
-            </code>
-          </p>
-        </div>
-
-        <div className="flex-grow bg-base-300 w-full mt-16 px-8 py-12">
-          <div className="flex justify-center items-center gap-12 flex-col sm:flex-row">
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <BugAntIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Tinker with your smart contract using the{" "}
-                <Link href="/debug" passHref className="link">
-                  Debug Contracts
-                </Link>{" "}
-                tab.
-              </p>
+        <div className="px-5 w-full max-w-3xl">
+          {knownTokens.length > 0 && (
+            <div className="w-full">
+              <TokenList tokens={knownTokens} onTokenClick={token => console.log("clicked:", token)} />
             </div>
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <MagnifyingGlassIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Explore your local transactions with the{" "}
-                <Link href="/blockexplorer" passHref className="link">
-                  Block Explorer
-                </Link>{" "}
-                tab.
-              </p>
-            </div>
+          )}
+          <div>
+            <OnchainKitTokens key={tokenKey} onTokenSelect={handleTokenSelect} />
           </div>
         </div>
       </div>
