@@ -18,6 +18,8 @@ type TokenPair = {
     name: string;
     symbol: string;
   };
+  priceNative: string;
+  priceUsd: string | null;
 };
 
 type TokenPairData = {
@@ -52,13 +54,13 @@ export function TokenList({ tokens }: TokenListProps) {
   }
 
   const tokensWithPrices = tokens.map(token => {
-    const tokenPair = data.pairs.find((pair: TokenPair) => {
+    const tokenPair = data?.pairs?.find((pair: TokenPair) => {
       return pair.baseToken.address.toLowerCase() === token.address.toLowerCase();
-    });
+    }) as TokenPair;
     return {
       ...token,
-      priceUsd: tokenPair ? tokenPair.priceUsd : "",
-      dexScreenerUrl: tokenPair ? tokenPair.url : "",
+      priceUsd: tokenPair?.priceUsd ? tokenPair.priceUsd : "",
+      dexScreenerUrl: tokenPair?.url ? tokenPair.url : "",
     };
   });
 
