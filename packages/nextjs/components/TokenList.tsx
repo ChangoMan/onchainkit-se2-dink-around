@@ -1,29 +1,74 @@
+import Link from "next/link";
 import type { Token } from "@coinbase/onchainkit/token";
 import { TokenRow } from "@coinbase/onchainkit/token";
-import { quote } from "~~/utils/uniswap/quote";
+import { useQuery } from "@tanstack/react-query";
 
 interface TokenListProps {
   tokens: Token[];
   onTokenClick?: (token: Token) => void;
 }
 
-export function TokenList({ tokens, onTokenClick }: TokenListProps) {
-  console.log("tokens", tokens);
+type TokenPair = {
+  chainId: string;
+  dexId: string;
+  url: string;
+  pairAddress: string;
+  baseToken: {
+    address: string;
+    name: string;
+    symbol: string;
+  };
+};
+
+type TokenPairData = {
+  schemaVersion: string;
+  pairs: TokenPair[];
+};
+
+async function getTokenPrices(tokenAddresses: string): Promise<TokenPairData> {
+  const response = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${tokenAddresses}`);
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  return response.json();
+}
+
+export function TokenList({ tokens }: TokenListProps) {
+  const tokenAddresses = tokens.map(token => token.address).join(",");
+
+  const { data, isPending } = useQuery<TokenPairData>({
+    queryKey: ["tokenPrices", tokenAddresses],
+    queryFn: () => getTokenPrices(tokenAddresses),
+  });
+
+  if (isPending) {
+    return (
+      <div>
+        {tokens.map(token => (
+          <div key={`${token.chainId}-${token.address}`} className="my-1 skeleton h-14 w-full"></div>
+        ))}
+      </div>
+    );
+  }
+
+  const tokensWithPrices = tokens.map(token => {
+    const tokenPair = data.pairs.find((pair: TokenPair) => {
+      return pair.baseToken.address.toLowerCase() === token.address.toLowerCase();
+    });
+    return {
+      ...token,
+      priceUsd: tokenPair ? tokenPair.priceUsd : "",
+      dexScreenerUrl: tokenPair ? tokenPair.url : "",
+    };
+  });
 
   return (
-    <div className="">
-      {tokens.map(token => (
-        <div key={`${token.chainId}-${token.address}`} className="">
-          <TokenRow token={token} onClick={onTokenClick} className="mb-2" />
-          <button
-            className="btn btn-primary"
-            onClick={async () => {
-              const amount = await quote();
-              console.log("quote", amount);
-            }}
-          >
-            Quote
-          </button>
+    <div>
+      {tokensWithPrices.map(token => (
+        <div key={`${token.chainId}-${token.address}`}>
+          <Link href={token.dexScreenerUrl} target="blank">
+            <TokenRow className="mb-2" token={token} amount={token.priceUsd} />
+          </Link>
         </div>
       ))}
     </div>
