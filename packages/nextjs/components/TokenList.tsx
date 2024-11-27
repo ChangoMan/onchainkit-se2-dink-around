@@ -1,6 +1,5 @@
-import Link from "next/link";
+import { TokenRow } from "./TokenRow";
 import type { Token } from "@coinbase/onchainkit/token";
-import { TokenRow } from "@coinbase/onchainkit/token";
 import { useQuery } from "@tanstack/react-query";
 
 interface TokenListProps {
@@ -68,9 +67,7 @@ export function TokenList({ tokens }: TokenListProps) {
     <div>
       {tokensWithPrices.map(token => (
         <div key={`${token.chainId}-${token.address}`}>
-          <Link href={token.dexScreenerUrl} target="blank">
-            <TokenRow className="mb-2" token={token} amount={token.priceUsd} />
-          </Link>
+          <TokenRow token={token} />
         </div>
       ))}
     </div>
