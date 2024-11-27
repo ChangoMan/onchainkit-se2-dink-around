@@ -25,22 +25,21 @@ const Home: NextPage = () => {
   // Initialize knownTokens from URL params
   useEffect(() => {
     const fetchTokenDetails = async (addresses: string[]) => {
-      const tokenPromises = addresses.map(address => {
+      const tokenPromises = addresses.map(async address => {
         // Convert zero address back to empty string when fetching
         const searchAddress = address === "0x0000000000000000000000000000000000000000" ? "" : address;
-        return getTokens({ limit: "1", search: searchAddress })
-          .then(response => {
-            console.log("response", response);
-            return response[0];
-          })
-          .catch(error => {
-            console.error(`Error fetching token ${address}:`, error);
-            return null;
-          });
+        try {
+          const response = (await getTokens({ limit: "1", search: searchAddress })) as Token[];
+          console.log("response", response);
+          return response[0];
+        } catch (error) {
+          console.error(`Error fetching token ${address}:`, error);
+          return null;
+        }
       });
 
       const tokens = await Promise.all(tokenPromises);
-      setKnownTokens(tokens.filter((token: Token) => token !== null));
+      setKnownTokens(tokens.filter((token: Token | null) => token !== null) as Token[]);
     };
 
     const tokensParam = searchParams.get("tokens");
