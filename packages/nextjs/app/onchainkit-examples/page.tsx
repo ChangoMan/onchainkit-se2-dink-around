@@ -25,7 +25,11 @@ const OnchainKitExample: NextPage = () => {
       <OnchainKitSwap />
 
       <div className="mt-6 text-xl text-center font-bold">Tokens</div>
-      <OnchainKitTokens />
+      <OnchainKitTokens
+        onTokenSelect={() => {
+          console.log("token");
+        }}
+      />
 
       <div className="mt-6 text-xl text-center font-bold">Wallet</div>
       <OnchainKitWallet />
