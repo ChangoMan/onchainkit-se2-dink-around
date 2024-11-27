@@ -5,26 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { OnchainKitTokens } from "./onchainkit-examples/_components/OnchainKitTokens";
 import { setOnchainKitConfig } from "@coinbase/onchainkit";
 import { getTokens } from "@coinbase/onchainkit/api";
-import { TokenRow } from "@coinbase/onchainkit/token";
 import type { Token } from "@coinbase/onchainkit/token";
 import type { NextPage } from "next";
-
-interface TokenListProps {
-  tokens: Token[];
-  onTokenClick?: (token: Token) => void;
-}
-
-export function TokenList({ tokens, onTokenClick }: TokenListProps) {
-  return (
-    <div className="">
-      {tokens.map(token => (
-        <div key={`${token.chainId}-${token.address}`} className="">
-          <TokenRow token={token} onClick={onTokenClick} className="mb-2" />
-        </div>
-      ))}
-    </div>
-  );
-}
+import { TokenList } from "~~/components/TokenList";
 
 const Home: NextPage = () => {
   const router = useRouter();
@@ -57,7 +40,7 @@ const Home: NextPage = () => {
       });
 
       const tokens = await Promise.all(tokenPromises);
-      setKnownTokens(tokens.filter(token => token !== null));
+      setKnownTokens(tokens.filter((token: Token) => token !== null));
     };
 
     const tokensParam = searchParams.get("tokens");
