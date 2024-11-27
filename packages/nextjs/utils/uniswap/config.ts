@@ -7,6 +7,7 @@ export interface ExampleConfig {
   rpc: {
     local: string;
     mainnet: string;
+    base: string;
   };
   tokens: {
     in: Token;
@@ -22,11 +23,12 @@ export const CurrentConfig: ExampleConfig = {
   rpc: {
     local: "http://localhost:8545",
     mainnet: "https://eth-mainnet.g.alchemy.com/v2/oKxs-03sij-U_N0iOlrSsZFr29-IqbuF",
+    base: "https://base-mainnet.g.alchemy.com/v2/oKxs-03sij-U_N0iOlrSsZFr29-IqbuF",
   },
   tokens: {
     in: USDC_TOKEN,
     amountIn: 1000,
     out: WETH_TOKEN,
-    poolFee: FeeAmount.MEDIUM,
+    poolFee: FeeAmount.LOW,
   },
 };
