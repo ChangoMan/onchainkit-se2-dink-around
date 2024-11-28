@@ -68,10 +68,10 @@ export function TokenList({ tokens }: TokenListProps) {
   });
 
   return (
-    <dl className="mt-5 grid grid-cols-1 gap-5">
+    <div>
       {tokensWithPrices.map(token => (
         <TokenRow key={`${token.chainId}-${token.address}`} token={token as TokenWithData} />
       ))}
-    </dl>
+    </div>
   );
 }
