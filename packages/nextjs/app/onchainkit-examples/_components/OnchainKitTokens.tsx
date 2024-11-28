@@ -20,10 +20,10 @@ export const OnchainKitTokens = ({ onTokenSelect }: OnchainKitTokensProps) => {
   }, []);
 
   return (
-    <div className="flex flex-col w-full max-w-[500px] gap-4 rounded-3xl p-4">
+    <div className="flex flex-col w-full max-w-[500px] mx-auto gap-4 rounded-3xl p-4">
       <TokenSearch onChange={handleChange} delayMs={200} />
       {filteredTokens.length > 0 && (
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {filteredTokens.map(token => (
             <TokenChip key={token.address} token={token} onClick={onTokenSelect} />
           ))}
@@ -31,7 +31,7 @@ export const OnchainKitTokens = ({ onTokenSelect }: OnchainKitTokensProps) => {
       )}
       {filteredTokens.length > 0 ? (
         <div>
-          <div className="text-body text-black">Tokens</div>
+          <div className="text-body text-gray-50 mb-2">Tokens</div>
           <div>
             {filteredTokens.map(token => (
               <TokenRow key={token.address} token={token} onClick={onTokenSelect} />
@@ -39,7 +39,7 @@ export const OnchainKitTokens = ({ onTokenSelect }: OnchainKitTokensProps) => {
           </div>
         </div>
       ) : (
-        <div className="text-body text-black"></div>
+        <div className="text-body text-gray-50"></div>
       )}
     </div>
   );

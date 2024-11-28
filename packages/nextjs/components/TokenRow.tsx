@@ -37,8 +37,8 @@ export function TokenRow({ token }: { token: TokenWithData }) {
               )}
             </div>
             <div className="flex items-center ml-auto">
-              <a className="inline-block mx-4" href={token.url} target="blank">
-                <img src="/logo-dex-screener.svg" alt="Dex Screener" className="w-6 h-6" />
+              <a className="inline-block mx-4 shrink-0" href={token.url} target="blank">
+                <img src="/logo-dex-screener.svg" alt="Dex Screener" className="w-5 h-5" />
               </a>
               <button className="mx-1 btn btn-sm btn-outline">Buy</button>
               <button className="mx-1 btn btn-sm btn-outline">Sell</button>
