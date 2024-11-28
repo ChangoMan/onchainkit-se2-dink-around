@@ -1,8 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import type { Token } from "@coinbase/onchainkit/token";
-import Pair from "~~/types/dexscreener/pair";
-
-type TokenWithData = Token & Pair;
+import { TokenWithData } from "~~/types/dexscreener/pair";
 
 function formatNumberWithAbbreviation(num: number): string {
   if (num >= 1e9) {

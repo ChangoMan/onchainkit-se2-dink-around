@@ -1,4 +1,6 @@
-export default interface Pair {
+import type { Token } from "@coinbase/onchainkit/token";
+
+export interface Pair {
   chainId: string;
   dexId: string;
   url: string;
@@ -24,3 +26,5 @@ export default interface Pair {
   marketCap?: number;
   pairCreatedAt?: number;
 }
+
+export type TokenWithData = Token & Pair;

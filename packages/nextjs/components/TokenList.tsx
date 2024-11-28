@@ -1,7 +1,7 @@
 import { TokenRow } from "./TokenRow";
 import type { Token } from "@coinbase/onchainkit/token";
 import { useQuery } from "@tanstack/react-query";
-import Pair from "~~/types/dexscreener/pair";
+import { Pair, TokenWithData } from "~~/types/dexscreener/pair";
 
 interface TokenListProps {
   tokens: Token[];
@@ -11,6 +11,16 @@ interface TokenListProps {
 type TokenPairData = {
   schemaVersion: string;
   pairs: Pair[];
+};
+
+const TOKEN_PAIR_DEFAULT = {
+  url: "",
+  pairAddress: "",
+  dexId: "",
+  chainId: "",
+  priceNative: "",
+  priceUsd: "",
+  marketCap: "",
 };
 
 async function getTokenPrices(tokenAddresses: string): Promise<TokenPairData> {
@@ -45,7 +55,10 @@ export function TokenList({ tokens }: TokenListProps) {
     }) as Pair;
 
     if (!tokenPair) {
-      return token;
+      return {
+        ...token,
+        ...TOKEN_PAIR_DEFAULT,
+      };
     }
 
     return {
@@ -58,7 +71,7 @@ export function TokenList({ tokens }: TokenListProps) {
     <div>
       {tokensWithPrices.map(token => (
         <div key={`${token.chainId}-${token.address}`}>
-          <TokenRow token={token} />
+          <TokenRow token={token as TokenWithData} />
         </div>
       ))}
     </div>
