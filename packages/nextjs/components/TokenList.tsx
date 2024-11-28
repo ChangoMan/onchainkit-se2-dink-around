@@ -43,7 +43,7 @@ export function TokenList({ tokens }: TokenListProps) {
     return (
       <div>
         {tokens.map(token => (
-          <div key={`${token.chainId}-${token.address}`} className="my-1 skeleton h-14 w-full"></div>
+          <div key={`${token.chainId}-${token.address}`} className="my-2 skeleton h-20 w-full"></div>
         ))}
       </div>
     );
@@ -68,12 +68,10 @@ export function TokenList({ tokens }: TokenListProps) {
   });
 
   return (
-    <div>
+    <dl className="mt-5 grid grid-cols-1 gap-5">
       {tokensWithPrices.map(token => (
-        <div key={`${token.chainId}-${token.address}`}>
-          <TokenRow token={token as TokenWithData} />
-        </div>
+        <TokenRow key={`${token.chainId}-${token.address}`} token={token as TokenWithData} />
       ))}
-    </div>
+    </dl>
   );
 }
