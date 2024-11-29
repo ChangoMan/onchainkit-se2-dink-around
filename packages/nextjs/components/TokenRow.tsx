@@ -21,10 +21,14 @@ export function TokenRow({ token }: { token: TokenWithData }) {
           {token.image && <img alt={token.name} src={token.image} className="size-10 rounded-full" />}
         </div>
         <div>
-          <p className="m-0 text-sm font-medium text-gray-50">{token.name}</p>
-          <p className="m-0 truncate text-sm text-gray-400">{token.symbol}</p>
+          <p className="m-0 text-sm font-medium text-base-content">{token.name}</p>
+          <p className="m-0 truncate text-sm text-gray-500 dark:text-gray-400">{token.symbol}</p>
         </div>
-        <a className="inline-block ml-auto shrink-0 md:mr-4" href={token.url} target="blank">
+        <a
+          className="inline-block ml-auto p-1 bg-gray-700 rounded-full shrink-0 md:mr-4"
+          href={token.url}
+          target="blank"
+        >
           <img src="/logo-dex-screener.svg" alt="Dex Screener" className="w-5 h-5" />
         </a>
       </div>
@@ -32,9 +36,9 @@ export function TokenRow({ token }: { token: TokenWithData }) {
         <div className="flex items-center md:gap-4">
           <div className="flex justify-between items-center flex-1">
             <div className="px-2">
-              <p className="m-0 text-sm text-gray-50">Price: ${token.priceUsd}</p>
+              <p className="m-0 text-sm text-base-content">Price: ${token.priceUsd}</p>
               {token.marketCap && (
-                <p className="m-0 text-sm text-green-500">
+                <p className="m-0 text-sm text-green-600 dark:text-green-500">
                   Market Cap: ${formatNumberWithAbbreviation(token.marketCap)}
                 </p>
               )}
